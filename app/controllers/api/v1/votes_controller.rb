@@ -1,9 +1,10 @@
 module Api
     module V1
       class VotesController < ApplicationController
+        
         def index
           votes = Vote.all
-          render json: votes, status: :ok
+          render json: votes
         end
   
         def create
@@ -17,7 +18,20 @@ module Api
   
         def show
           vote = Vote.find_by(voter_address: params[:id])
-          render json: vote
+          if vote
+            render json: vote
+          else
+            render json: { error: 'Vote not found' }, status: :not_found
+          end
+        end
+  
+        def candidate_votes
+          votes = Vote.where(candidate_address: params[:address])
+          render json: {
+            candidate_address: params[:address],
+            vote_count: votes.count,
+            votes: votes
+          }
         end
   
         private
